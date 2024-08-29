@@ -1,0 +1,42 @@
+services:
+  healthcheck:
+    image: appropriate/curl
+    command: >
+      sh -c "
+      while ! curl -s http://app1:8080; do sleep 2; done &&
+      while ! curl -s http://app2:8080; do sleep 2; done
+      "
+    depends_on:
+      - app1
+      - app2
+    restart: no
+    networks:
+      - bridge
+
+  app1:
+    image: tomcat
+    ports:
+      - "8081:8080"
+    networks:
+      - bridge
+
+  app2:
+    image: tomcat
+    ports:
+      - "8082:8080"
+    networks:
+      - bridge
+
+  app3:
+    image: tomcat
+    ports:
+      - "8083:8080"
+    depends_on:
+      healthcheck:
+        condition: service_completed_successfully
+    networks:
+      - bridge
+
+networks:
+  bridge:
+    driver: bridge

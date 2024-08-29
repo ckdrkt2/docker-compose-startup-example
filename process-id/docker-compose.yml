@@ -1,0 +1,39 @@
+services:
+  app1:
+    container_name: app1
+    image: tomcat
+    healthcheck:
+      test: ["CMD", "pidof", "java"]
+      start_period: 30s
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    networks:
+      - bridge
+
+  app2:
+    container_name: app2
+    image: tomcat
+    healthcheck:
+      test: ["CMD", "pidof", "java"]
+      start_period: 30s
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    networks:
+      - bridge
+
+  app3:
+    container_name: app3
+    image: tomcat
+    depends_on:
+      app1:
+        condition: service_healthy
+      app2:
+        condition: service_healthy
+    networks:
+      - bridge
+
+networks:
+  bridge:
+    driver: bridge
